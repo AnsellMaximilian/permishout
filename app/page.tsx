@@ -1,14 +1,24 @@
 import { buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
+import logo from "@/assets/images/permishout-logo-full-vertical.svg";
+import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="container mx-auto flex flex-col justify-center items-center">
-      <div className="text-center">
-        <h1 className="font-bold text-2xl">PermiShout!</h1>
+    <div className="bg-white grow">
+      <div className="mx-auto container flex flex-col justify-center items-center h-screen">
+        <Link href="/profile/create">
+          <Image src={logo} alt="PermiShout Logo" width={400} height={400} />
+        </Link>
 
-        <Link href="/home" className={buttonVariants()}>
-          Get Started
+        <h1 className="text-3xl font-bold text-center mb-2 mt-10">
+          Welcome to Permi<span className="text-[#FF9747]">S</span>hout
+        </h1>
+        <p className="text-lg text-center mb-8">
+          Your one-stop platform for sharing and discovering shouts.
+        </p>
+        <Link href="/profile/create" className={buttonVariants({ size: "lg" })}>
+          Create Profile
         </Link>
       </div>
     </div>
