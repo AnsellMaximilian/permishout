@@ -1,7 +1,7 @@
 import { getAuth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
-import { clerkClient } from "@clerk/nextjs";
-import permit from "@/app/lib/permit";
+import permit from "@/lib/permit";
+import { clerkClient } from "@/lib/clerk";
 
 const GET = async (request: NextRequest) => {
   const { userId } = getAuth(request) || "";
