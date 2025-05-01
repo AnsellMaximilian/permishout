@@ -24,6 +24,7 @@ export default clerkMiddleware(async (auth, req) => {
     await permitApi.get(
       `/v2/facts/${project_id}/${environment_id}/users/${userId}`
     );
+    isProfileComplete = true;
   } catch {
     isProfileComplete = false;
   }
