@@ -15,7 +15,7 @@ export default function Home() {
           Welcome to Permi<span className="text-[#FF9747]">S</span>hout
         </h1>
         <p className="text-lg text-center mb-8">
-          Your one-stop platform for sharing and discovering shouts.
+          Shout only when you’re allowed.
         </p>
         <Link href="/profile/create" className={buttonVariants({ size: "lg" })}>
           Create Profile

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "setupPermit": "node ./scripts/setup.js"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.18.1",
@@ -17,6 +18,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "country-list": "^2.3.0",
+    "dotenv": "^16.5.0",
     "lucide-react": "^0.503.0",
     "next": "15.3.1",
     "next-themes": "^0.4.6",
