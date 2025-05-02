@@ -6,6 +6,7 @@ import ShoutItem from "@/components/shouts/ShoutItem";
 import { mockShouts } from "@/const/shout";
 
 const mockUser: PermishoutUser = {
+  key: "user_1",
   name: "Jane Doe",
   username: "janed",
   email: "jane@example.com",
@@ -13,7 +14,7 @@ const mockUser: PermishoutUser = {
   country: "USA",
 };
 
-export default function ProfilePage() {
+export default function ProfilePage({}: { params: { key: string } }) {
   const user = mockUser;
 
   return (
