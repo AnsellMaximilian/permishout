@@ -7,7 +7,6 @@ const GET = async (
   { params }: { params: Promise<{ key: string }> }
 ) => {
   const { key: shoutKey } = await params;
-  console.log({ shoutKey });
 
   try {
     const shout = await permit.api.resourceInstances.getByKey(

@@ -3,19 +3,19 @@ import React from "react";
 import icon from "@/assets/images/permishout-icon.svg";
 import Image from "next/image";
 import ShoutItem from "@/components/shouts/ShoutItem";
-import { mockShouts } from "@/const/shout";
 import { Cake, Calendar, MapPin } from "lucide-react";
 import IconText from "@/components/IconText";
 import { format } from "date-fns";
 import api from "@/lib/api";
 import { notFound } from "next/navigation";
+import { Shout } from "@/types/shout";
 
 export default async function ProfilePage({
   params,
 }: {
-  params: { key: string };
+  params: Promise<{ key: string }>;
 }) {
-  const { key } = params;
+  const { key } = await params;
   let user: null | PermishoutUser = null;
 
   try {
@@ -26,6 +26,9 @@ export default async function ProfilePage({
   }
 
   if (!user) notFound();
+
+  const shouts: Shout[] = (await api.get(`/shouts?shouterKey=${key}`)).data;
+
   return (
     <div className="mx-auto max-w-2xl bg-white mt-4 rounded-md">
       <div className="border-border border-b">
@@ -49,7 +52,7 @@ export default async function ProfilePage({
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        {mockShouts.map((shout) => (
+        {shouts.map((shout) => (
           <ShoutItem key={shout.key} shout={shout} />
         ))}
       </div>

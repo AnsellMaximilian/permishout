@@ -6,7 +6,10 @@ import { v4 as uuidv4 } from "uuid";
 import { PermishoutUserAttributes } from "@/types/user";
 import { joinName } from "@/lib/utils";
 
-const GET = async () => {
+const GET = async (request: NextRequest) => {
+  const searchParams = request.nextUrl.searchParams;
+  const shouterkey = searchParams.get("shouterKey");
+
   try {
     const shouts = await permit.api.resourceInstances.list({
       resource: "shout",
@@ -23,7 +26,14 @@ const GET = async () => {
         ...shoutAttrs,
       };
     });
-
+    // if shouterkey is provided, filter the shoutList
+    if (shouterkey) {
+      const filteredShouts = shoutList.filter(
+        (shout) => shout.userId === shouterkey
+      );
+      return NextResponse.json(filteredShouts);
+    }
+    // if shouterkey is not provided, return all shouts
     return NextResponse.json(shoutList);
   } catch (e) {
     return NextResponse.json(
