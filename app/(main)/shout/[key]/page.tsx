@@ -6,6 +6,7 @@ import { MessageCircle, Repeat, Heart } from "lucide-react";
 import ShoutItem from "@/components/shouts/ShoutItem";
 import api from "@/lib/api";
 import { Shout } from "@/types/shout";
+import Link from "next/link";
 
 export default async function ShoutPage({
   params,
@@ -33,10 +34,20 @@ export default async function ShoutPage({
 
   return (
     <div className="mx-auto max-w-2xl mt-6 bg-white shadow-md rounded-md">
-      <div className="p-6 rounded-lg space-y-4">
-        <div className="space-y-1">
-          <h2 className="text-lg font-bold text-foreground">{shout.name}</h2>
-          <p className="text-muted-foreground">@{shout.username}</p>
+      <div className="p-4 rounded-lg space-y-4">
+        <div className="">
+          <Link
+            href={`/profile/${shout.userId}`}
+            className="text-lg font-bold text-foreground block hover:underline"
+          >
+            {shout.name}
+          </Link>
+          <Link
+            href={`/profile/${shout.userId}`}
+            className="text-muted-foreground block hover:underline"
+          >
+            @{shout.username}
+          </Link>
         </div>
 
         <p className="text-lg text-foreground whitespace-pre-wrap">
