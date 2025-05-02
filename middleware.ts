@@ -4,11 +4,15 @@ import permitApi from "./lib/permitApi";
 
 const isPublicRoute = createRouteMatcher(["/profile/create"]);
 
-const isProtectedRoute = createRouteMatcher(["/home(.*)"]);
+const isProtectedRoute = createRouteMatcher([
+  "/home(.*)",
+  "/profile(.*)",
+  "/shout(.*)",
+]);
 
 export default clerkMiddleware(async (auth, req) => {
   const userId = (await auth()).userId;
-  const { origin } = req.nextUrl;
+  const { origin, pathname } = req.nextUrl;
 
   if (isProtectedRoute(req)) await auth.protect();
 
@@ -34,7 +38,11 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.redirect(`${origin}/home`);
 
   // if the user has not completed their profile and is trying to access a protected route, redirect to profile creation page
-  if (!isProfileComplete && isProtectedRoute(req)) {
+  if (
+    !isProfileComplete &&
+    isProtectedRoute(req) &&
+    !pathname.startsWith("/profile/create")
+  ) {
     return NextResponse.redirect(`${origin}/profile/create`);
   }
 });

@@ -29,7 +29,7 @@ import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 
 const currentYear = new Date().getFullYear();
-const years = Array.from({ length: currentYear - 1989 }, (_, i) => 1990 + i);
+const years = Array.from({ length: currentYear - 1919 }, (_, i) => 1920 + i);
 
 export default function ProfileCreationPage() {
   const [username, setUsername] = useState("");
@@ -73,7 +73,7 @@ export default function ProfileCreationPage() {
     } finally {
       setIsLoading(false);
       router.refresh();
-      router.push("/plan");
+      router.push("/home");
     }
   };
 

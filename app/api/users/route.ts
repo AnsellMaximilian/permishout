@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import permit from "@/lib/permit";
 import { clerkClient } from "@/lib/clerk";
 import { splitName } from "@/lib/utils";
+import { PermishoutUser } from "@/types/user";
 
 const GET = async (request: NextRequest) => {
   const { userId } = getAuth(request) || "";
@@ -20,7 +21,20 @@ const GET = async (request: NextRequest) => {
     );
   }
 
-  return NextResponse.json(user);
+  const attrs = user.attributes as
+    | { username: string; country: string; yearBorn: number }
+    | undefined;
+
+  const permishoutUser: PermishoutUser = {
+    key: user.key,
+    createdAt: user.created_at,
+    email: user.email || "",
+    name: user.first_name || "" + user.last_name || "",
+    country: attrs?.country || "",
+    username: attrs?.username || "",
+    yearBorn: attrs?.yearBorn || 1990,
+  };
+  return NextResponse.json(permishoutUser);
 };
 
 const POST = async (request: NextRequest) => {
