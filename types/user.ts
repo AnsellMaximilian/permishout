@@ -5,4 +5,5 @@ export interface PermishoutUser {
   email: string;
   yearBorn: number;
   country: string;
+  createdAt: string;
 }

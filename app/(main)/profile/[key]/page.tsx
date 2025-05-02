@@ -4,6 +4,9 @@ import icon from "@/assets/images/permishout-icon.svg";
 import Image from "next/image";
 import ShoutItem from "@/components/shouts/ShoutItem";
 import { mockShouts } from "@/const/shout";
+import { Cake, Calendar, MapPin } from "lucide-react";
+import IconText from "@/components/IconText";
+import { format } from "date-fns";
 
 const mockUser: PermishoutUser = {
   key: "user_1",
@@ -12,6 +15,7 @@ const mockUser: PermishoutUser = {
   email: "jane@example.com",
   yearBorn: 1995,
   country: "USA",
+  createdAt: "2025-05-02T05:44:08.762Z",
 };
 
 export default function ProfilePage({}: { params: { key: string } }) {
@@ -26,22 +30,20 @@ export default function ProfilePage({}: { params: { key: string } }) {
           <p className="text-muted-foreground">@{user.username}</p>
         </div>
 
-        <div className="grid grid-cols-1 gap-2 text-sm text-muted-foreground p-4">
-          <div className="flex justify-between">
-            <span className="font-medium text-foreground">Email:</span>
-            <span>{user.email}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="font-medium text-foreground">Year Born:</span>
-            <span>{user.yearBorn}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="font-medium text-foreground">Country:</span>
-            <span>{user.country}</span>
-          </div>
+        <div className="p-4 flex gap-2 justify-between flex-wrap">
+          <IconText icon={MapPin} text="Indonesia" />
+          <IconText icon={Cake} text={`Born ${user.yearBorn}`} />
+          <IconText
+            icon={Calendar}
+            text={`Joined ${format(new Date(user.createdAt), "MMMM yyyy")}`}
+          />
+        </div>
+
+        <div className="flex items-center gap-2 p-4">
+          <div className="font-bold">Following</div> <div>30</div>
         </div>
       </div>
-      <div className="mt-1 flex flex-col gap-4">
+      <div className="flex flex-col gap-4">
         {mockShouts.map((shout) => (
           <ShoutItem key={shout.key} shout={shout} />
         ))}
