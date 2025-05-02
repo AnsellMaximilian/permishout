@@ -2,13 +2,16 @@ import { getAuth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import permit from "@/lib/permit";
 import { clerkClient } from "@/lib/clerk";
-import { splitName } from "@/lib/utils";
+import { joinName, splitName } from "@/lib/utils";
 import { PermishoutUser, PermishoutUserAttributes } from "@/types/user";
 
 const GET = async (request: NextRequest) => {
   const { userId } = getAuth(request) || "";
 
-  const user = await permit.api.users.get(userId || "");
+  const searchParams = request.nextUrl.searchParams;
+  const userKey = searchParams.get("userKey");
+
+  const user = await permit.api.users.get(userKey || userId || "");
 
   if (!user) {
     return NextResponse.json(
@@ -27,7 +30,7 @@ const GET = async (request: NextRequest) => {
     key: user.key,
     createdAt: user.created_at,
     email: user.email || "",
-    name: user.first_name || "" + user.last_name || "",
+    name: joinName(user.first_name, user.last_name),
     country: attrs?.country || "",
     username: attrs?.username || "",
     yearBorn: attrs?.yearBorn || 1990,

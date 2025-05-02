@@ -7,20 +7,25 @@ import { mockShouts } from "@/const/shout";
 import { Cake, Calendar, MapPin } from "lucide-react";
 import IconText from "@/components/IconText";
 import { format } from "date-fns";
+import api from "@/lib/api";
+import { notFound } from "next/navigation";
 
-const mockUser: PermishoutUser = {
-  key: "user_1",
-  name: "Jane Doe",
-  username: "janed",
-  email: "jane@example.com",
-  yearBorn: 1995,
-  country: "USA",
-  createdAt: "2025-05-02T05:44:08.762Z",
-};
+export default async function ProfilePage({
+  params,
+}: {
+  params: { key: string };
+}) {
+  const { key } = params;
+  let user: null | PermishoutUser = null;
 
-export default function ProfilePage({}: { params: { key: string } }) {
-  const user = mockUser;
+  try {
+    const res = await api.get(`/users?userKey=${key}`);
+    user = res.data as PermishoutUser;
+  } catch {
+    user = null;
+  }
 
+  if (!user) notFound();
   return (
     <div className="mx-auto max-w-2xl bg-white mt-4 rounded-md">
       <div className="border-border border-b">
