@@ -34,3 +34,15 @@ export function toastError(message: string) {
 export function joinName(firstName?: string, lastName?: string): string {
   return [firstName?.trim(), lastName?.trim()].filter(Boolean).join(" ");
 }
+
+export function sortByDateDesc<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  T extends Record<string, any>,
+  K extends keyof T
+>(array: T[], key: K): T[] {
+  return [...array].sort((a, b) => {
+    const dateA = new Date(a[key] as string).getTime();
+    const dateB = new Date(b[key] as string).getTime();
+    return dateB - dateA;
+  });
+}

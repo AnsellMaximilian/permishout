@@ -9,7 +9,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import {
   isValidReplyMode,
   Shout,
@@ -20,7 +20,11 @@ import api from "@/lib/api";
 import { toastError } from "@/lib/utils";
 import { toast } from "sonner";
 
-export default function ShoutComposer() {
+export default function ShoutComposer({
+  setShouts,
+}: {
+  setShouts: Dispatch<SetStateAction<Shout[]>>;
+}) {
   const [content, setContent] = useState("");
   const [replyMode, setReplyMode] = useState<ShoutReplyType>(
     ShoutReplyType.EVERYONE
@@ -31,9 +35,9 @@ export default function ShoutComposer() {
   const handlePost = async () => {
     try {
       setLoading(true);
-      const shout: Shout = await api.post("/shouts", { content, replyMode });
-      console.log(shout);
-      toast("Shout shouted.");
+      const res = await api.post("/shouts", { content, replyMode });
+      setShouts((prev) => [res.data as Shout, ...prev]);
+      toast("You just shouted!");
     } catch (error) {
       console.error(error);
       toastError("Something went wrong.");

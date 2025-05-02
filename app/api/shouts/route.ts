@@ -4,7 +4,7 @@ import permit from "@/lib/permit";
 import { isValidReplyMode, Shout, ShoutAttributes } from "@/types/shout";
 import { v4 as uuidv4 } from "uuid";
 import { PermishoutUserAttributes } from "@/types/user";
-import { joinName } from "@/lib/utils";
+import { joinName, sortByDateDesc } from "@/lib/utils";
 
 const GET = async (request: NextRequest) => {
   const searchParams = request.nextUrl.searchParams;
@@ -31,10 +31,11 @@ const GET = async (request: NextRequest) => {
       const filteredShouts = shoutList.filter(
         (shout) => shout.userId === shouterkey
       );
-      return NextResponse.json(filteredShouts);
+      // filter by createdAt in descending order
+      return NextResponse.json(sortByDateDesc(filteredShouts, "createdAt"));
     }
     // if shouterkey is not provided, return all shouts
-    return NextResponse.json(shoutList);
+    return NextResponse.json(sortByDateDesc(shoutList, "createdAt"));
   } catch (e) {
     return NextResponse.json(
       {
@@ -55,11 +56,6 @@ const POST = async (request: NextRequest) => {
   if (!isValidReplyMode(replyMode) || !content)
     return NextResponse.json({ success: false }, { status: 400 });
   const permitUser = await permit.api.getUser(userId);
-
-  console.log({
-    firstName: permitUser.first_name,
-    lastName: permitUser.last_name,
-  });
 
   const shoutKey = `shout_${uuidv4()}`;
 
@@ -107,6 +103,8 @@ const POST = async (request: NextRequest) => {
       key: shout.key,
       ...(shout.attributes as ShoutAttributes),
     };
+
+    console.log(responseShout);
     return NextResponse.json(responseShout);
   } catch (e) {
     return NextResponse.json(
