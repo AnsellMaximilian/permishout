@@ -103,23 +103,22 @@ const createResources = async () => {
         name: "Follower",
         permissions: ["view"],
       },
+      followee: {
+        name: "Followee",
+        permissions: ["view"],
+      },
     },
   });
 };
 
 const createResourceRelations = async () => {
   console.log("Creating relation: Profile -> Shout");
-  await permit.api.resourceRelations.create("shout", {
-    key: "belongs",
-    name: "Belongs",
-    subject_resource: "profile",
-  });
 
   console.log("Creating relation: Shout <- Profile");
-  await permit.api.resourceRelations.create("profile", {
+  await permit.api.resourceRelations.create("shout", {
     key: "parent",
     name: "Parent",
-    subject_resource: "shout",
+    subject_resource: "profile",
   });
 };
 
@@ -131,9 +130,14 @@ const createRoleDerivations = async () => {
     granted_to: {
       users_with_role: [
         {
-          linked_by_relation: "belongs",
+          linked_by_relation: "parent",
           on_resource: "profile",
           role: "follower",
+        },
+        {
+          linked_by_relation: "parent",
+          on_resource: "profile",
+          role: "followee",
         },
       ],
     },
