@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import permit from "@/lib/permit";
 import { clerkClient } from "@/lib/clerk";
 import { splitName } from "@/lib/utils";
-import { PermishoutUser } from "@/types/user";
+import { PermishoutUser, PermishoutUserAttributes } from "@/types/user";
 
 const GET = async (request: NextRequest) => {
   const { userId } = getAuth(request) || "";
@@ -21,9 +21,7 @@ const GET = async (request: NextRequest) => {
     );
   }
 
-  const attrs = user.attributes as
-    | { username: string; country: string; yearBorn: number }
-    | undefined;
+  const attrs = user.attributes as PermishoutUserAttributes | undefined;
 
   const permishoutUser: PermishoutUser = {
     key: user.key,

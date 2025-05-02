@@ -10,18 +10,37 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { useState } from "react";
-import { ShoutReplyLabels, ShoutReplyType } from "@/types/shout";
+import {
+  isValidReplyMode,
+  Shout,
+  ShoutReplyLabels,
+  ShoutReplyType,
+} from "@/types/shout";
+import api from "@/lib/api";
+import { toastError } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function ShoutComposer() {
-  const [postText, setPostText] = useState("");
-  const [replyOption, setReplyOption] = useState("everyone");
+  const [content, setContent] = useState("");
+  const [replyMode, setReplyMode] = useState<ShoutReplyType>(
+    ShoutReplyType.EVERYONE
+  );
 
-  const handlePost = () => {
-    if (postText.trim()) {
-      console.log("Posting:", postText);
-      console.log("Who can reply:", replyOption);
-      setPostText("");
-      setReplyOption("everyone");
+  const [loading, setLoading] = useState(false);
+
+  const handlePost = async () => {
+    try {
+      setLoading(true);
+      const shout: Shout = await api.post("/shouts", { content, replyMode });
+      console.log(shout);
+      toast("Shout shouted.");
+    } catch (error) {
+      console.error(error);
+      toastError("Something went wrong.");
+    } finally {
+      setLoading(false);
+      setContent("");
+      setReplyMode(ShoutReplyType.EVERYONE);
     }
   };
 
@@ -30,13 +49,20 @@ export default function ShoutComposer() {
       <Textarea
         placeholder="What's happening?"
         className="resize-none placeholder:text-xl cols border-none active:border-none shadow-none outline-none focus:border-none focus:outline-none focus-visible:ring-0"
-        value={postText}
+        value={content}
         style={{ fontSize: 20 }}
-        onChange={(e) => setPostText(e.target.value)}
+        onChange={(e) => setContent(e.target.value)}
       />
 
       <div className="flex justify-between items-center">
-        <Select value={replyOption} onValueChange={setReplyOption}>
+        <Select
+          value={replyMode}
+          onValueChange={(value) => {
+            if (isValidReplyMode(value)) {
+              setReplyMode(value as ShoutReplyType);
+            } else setReplyMode(ShoutReplyType.EVERYONE);
+          }}
+        >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Who can reply" />
           </SelectTrigger>
@@ -49,7 +75,7 @@ export default function ShoutComposer() {
           </SelectContent>
         </Select>
 
-        <Button onClick={handlePost} disabled={!postText.trim()}>
+        <Button onClick={handlePost} disabled={!content.trim() || loading}>
           Post
         </Button>
       </div>

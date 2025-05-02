@@ -21,3 +21,7 @@ export const ShoutReplyLabels: Record<ShoutReplyType, string> = {
   [ShoutReplyType.PEOPLE_FOLLOWED]: "People you follow",
   [ShoutReplyType.MENTIONED]: "Only people you mention",
 };
+
+export function isValidReplyMode(value: unknown): value is ShoutReplyType {
+  return Object.values(ShoutReplyType).includes(value as ShoutReplyType);
+}

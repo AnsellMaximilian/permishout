@@ -1,9 +1,12 @@
-export interface PermishoutUser {
+export type PermishoutUser = {
   key: string;
   name: string;
-  username: string;
   email: string;
+  createdAt: string;
+} & PermishoutUserAttributes;
+
+export type PermishoutUserAttributes = {
   yearBorn: number;
   country: string;
-  createdAt: string;
-}
+  username: string;
+};
