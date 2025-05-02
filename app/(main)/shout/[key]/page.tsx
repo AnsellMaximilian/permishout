@@ -4,11 +4,25 @@ import { notFound } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 import { MessageCircle, Repeat, Heart } from "lucide-react";
 import ShoutItem from "@/components/shouts/ShoutItem";
+import api from "@/lib/api";
+import { Shout } from "@/types/shout";
 
-export default function ShoutPage({ params }: { params: { key: string } }) {
+export default async function ShoutPage({
+  params,
+}: {
+  params: { key: string };
+}) {
   const { key } = params;
 
-  const shout = mockShouts.find((s) => s.key === key);
+  let shout: null | Shout = null;
+
+  try {
+    const res = await api.get(`/shouts/${key}`);
+    shout = res.data as Shout;
+  } catch {
+    shout = null;
+  }
+
   if (!shout) notFound();
 
   const replies = mockShouts.filter((s) => s.key !== key).slice(0, 4);
@@ -18,7 +32,7 @@ export default function ShoutPage({ params }: { params: { key: string } }) {
   });
 
   return (
-    <div className="mx-auto max-w-2xl mt-6 bg-white shadow-md">
+    <div className="mx-auto max-w-2xl mt-6 bg-white shadow-md rounded-md">
       <div className="p-6 rounded-lg space-y-4">
         <div className="space-y-1">
           <h2 className="text-lg font-bold text-foreground">{shout.name}</h2>

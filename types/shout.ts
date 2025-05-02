@@ -1,5 +1,8 @@
-export interface Shout {
+export interface Shout extends ShoutAttributes {
   key: string;
+}
+
+export interface ShoutAttributes {
   name: string;
   content: string;
   userId: string;

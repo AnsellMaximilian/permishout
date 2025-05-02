@@ -30,3 +30,7 @@ export function toastError(message: string) {
     icon: <X />,
   });
 }
+
+export function joinName(firstName?: string, lastName?: string): string {
+  return [firstName?.trim(), lastName?.trim()].filter(Boolean).join(" ");
+}

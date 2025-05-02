@@ -1,9 +1,40 @@
 import { getAuth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import permit from "@/lib/permit";
-import { isValidReplyMode, Shout, ShoutReplyType } from "@/types/shout";
+import { isValidReplyMode, Shout, ShoutAttributes } from "@/types/shout";
 import { v4 as uuidv4 } from "uuid";
 import { PermishoutUserAttributes } from "@/types/user";
+import { joinName } from "@/lib/utils";
+
+const GET = async () => {
+  try {
+    const shouts = await permit.api.resourceInstances.list({
+      resource: "shout",
+      tenant: "default",
+      // filter: {
+      //   subject: `profile:profile_${userId}`,
+      // },
+    });
+    const shoutList: Shout[] = shouts.map((shout) => {
+      const shoutAttrs = shout.attributes as ShoutAttributes;
+
+      return {
+        key: shout.key,
+        ...shoutAttrs,
+      };
+    });
+
+    return NextResponse.json(shoutList);
+  } catch (e) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: e instanceof Error ? e.message : "Unknown error",
+      },
+      { status: 400 }
+    );
+  }
+};
 
 const POST = async (request: NextRequest) => {
   const { userId } = getAuth(request) || "";
@@ -15,25 +46,34 @@ const POST = async (request: NextRequest) => {
     return NextResponse.json({ success: false }, { status: 400 });
   const permitUser = await permit.api.getUser(userId);
 
+  console.log({
+    firstName: permitUser.first_name,
+    lastName: permitUser.last_name,
+  });
+
   const shoutKey = `shout_${uuidv4()}`;
 
   try {
+    const userAttrs = permitUser.attributes as
+      | PermishoutUserAttributes
+      | undefined;
+
+    const shoutAttrs: ShoutAttributes = {
+      content,
+      replyMode,
+      name: joinName(permitUser.first_name, permitUser.last_name),
+      userId,
+      createdAt: new Date().toISOString(),
+      username: userAttrs?.username || "",
+    };
     const shout = await permit.api.resourceInstances.create({
       resource: "shout",
       key: shoutKey,
       tenant: "default",
-      attributes: {
-        content,
-        replyMode,
-      },
+      attributes: shoutAttrs,
     });
 
     console.log("Created shout", shout);
-
-    const shoutAttrs = shout.attributes as {
-      content: string;
-      replyMode: ShoutReplyType;
-    };
 
     await permit.api.roleAssignments.assign({
       user: permitUser.key,
@@ -45,23 +85,17 @@ const POST = async (request: NextRequest) => {
     console.log("Set role assignment");
     console.log("Trying to set up relationship with " + userId);
     await permit.api.relationshipTuples.create({
-      subject: `shout:${shoutKey}`,
-      relation: "belongs",
-      object: `profile:profile_${userId}`,
+      object: `shout:${shoutKey}`,
+      relation: "parent",
+      subject: `profile:profile_${userId}`,
       tenant: "default",
     });
 
     console.log("created relationship");
 
-    const attrs = permitUser.attributes as PermishoutUserAttributes | undefined;
-
-    const responseShout: Omit<Shout, "key"> = {
-      content: shoutAttrs.content,
-      replyMode: shoutAttrs.replyMode,
-      createdAt: new Date().toISOString(),
-      name: permitUser.first_name || "" + permitUser.last_name || "",
-      userId,
-      username: attrs?.username || "",
+    const responseShout: Shout = {
+      key: shout.key,
+      ...(shout.attributes as ShoutAttributes),
     };
     return NextResponse.json(responseShout);
   } catch (e) {
@@ -75,4 +109,4 @@ const POST = async (request: NextRequest) => {
   }
 };
 
-export { POST };
+export { POST, GET };

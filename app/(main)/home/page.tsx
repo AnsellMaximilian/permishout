@@ -1,8 +1,20 @@
+"use client";
+
 import ShoutComposer from "@/components/shouts/ShoutComposer";
 import ShoutItem from "@/components/shouts/ShoutItem";
-import { mockShouts } from "@/const/shout";
+import api from "@/lib/api";
+import { Shout } from "@/types/shout";
+import { useEffect, useState } from "react";
 
 export default function HomePage() {
+  const [shouts, setShouts] = useState<Shout[]>([]);
+  useEffect(() => {
+    (async () => {
+      const shouts = await api.get("/shouts");
+
+      setShouts(shouts.data as Shout[]);
+    })();
+  }, []);
   return (
     <div className="mx-auto max-w-2xl bg-white mt-4 rounded-md">
       <div className="border-b border-border pb-4">
@@ -10,7 +22,7 @@ export default function HomePage() {
       </div>
 
       <div className="flex flex-col gap-4">
-        {mockShouts.map((shout) => (
+        {shouts.map((shout) => (
           <ShoutItem key={shout.key} shout={shout} />
         ))}
       </div>
