@@ -10,7 +10,7 @@ export default function RootLayout({
   return (
     <>
       <header className="p-4 bg-white">
-        <nav className="flex gap-8 items-center container mx-auto">
+        <nav className="flex gap-8 items-center container mx-auto max-w-4xl">
           <Link href="/home">
             <Image src={logo} alt="Permishout" width={200} height={50} />
           </Link>

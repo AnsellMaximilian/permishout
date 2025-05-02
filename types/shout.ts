@@ -1,0 +1,23 @@
+export interface Shout {
+  key: string;
+  name: string;
+  content: string;
+  userId: string;
+  createdAt: string;
+  replyMode: string;
+  username: string;
+}
+
+export enum ShoutReplyType {
+  EVERYONE = "EVERYONE",
+  FOLLOWERS = "FOLLOWERS",
+  PEOPLE_FOLLOWED = "PEOPLE_FOLLOWED",
+  MENTIONED = "MENTIONED",
+}
+
+export const ShoutReplyLabels: Record<ShoutReplyType, string> = {
+  [ShoutReplyType.EVERYONE]: "Everyone",
+  [ShoutReplyType.FOLLOWERS]: "Your followers",
+  [ShoutReplyType.PEOPLE_FOLLOWED]: "People you follow",
+  [ShoutReplyType.MENTIONED]: "Only people you mention",
+};
