@@ -9,6 +9,8 @@ import { format } from "date-fns";
 import api from "@/lib/api";
 import { notFound } from "next/navigation";
 import { Shout } from "@/types/shout";
+import { getCountryFromKey } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export default async function ProfilePage({
   params,
@@ -39,7 +41,7 @@ export default async function ProfilePage({
         </div>
 
         <div className="p-4 flex gap-2 justify-between flex-wrap">
-          <IconText icon={MapPin} text="Indonesia" />
+          <IconText icon={MapPin} text={getCountryFromKey(user.country)} />
           <IconText icon={Cake} text={`Born ${user.yearBorn}`} />
           <IconText
             icon={Calendar}
@@ -47,8 +49,11 @@ export default async function ProfilePage({
           />
         </div>
 
-        <div className="flex items-center gap-2 p-4">
-          <div className="font-bold">Following</div> <div>30</div>
+        <div className="flex items-center p-4">
+          <div className="flex items-center gap-2 ">
+            <div className="font-bold">Following</div> <div>30</div>
+          </div>
+          <Button className="rounded-full ml-auto">Follow</Button>
         </div>
       </div>
       <div className="flex flex-col gap-4">

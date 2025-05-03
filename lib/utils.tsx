@@ -46,3 +46,7 @@ export function sortByDateDesc<
     return dateB - dateA;
   });
 }
+
+export function getCountryFromKey(key: string) {
+  return key.split("-")[1] || "Not specified";
+}

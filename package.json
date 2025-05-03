@@ -10,6 +10,8 @@
     "setupPermit": "node ./scripts/setup.js"
   },
   "dependencies": {
+    "@casl/ability": "^6.7.3",
+    "@casl/react": "^5.0.0",
     "@clerk/nextjs": "^6.18.1",
     "@radix-ui/react-label": "^2.1.4",
     "@radix-ui/react-select": "^2.2.2",
@@ -22,6 +24,7 @@
     "lucide-react": "^0.503.0",
     "next": "15.3.1",
     "next-themes": "^0.4.6",
+    "permit-fe-sdk": "^1.6.0",
     "permitio": "^2.7.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
