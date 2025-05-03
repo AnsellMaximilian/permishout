@@ -10,7 +10,7 @@ import api from "@/lib/api";
 import { notFound } from "next/navigation";
 import { Shout } from "@/types/shout";
 import { getCountryFromKey } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import FollowSection from "@/components/profile/FollowSection";
 
 export default async function ProfilePage({
   params,
@@ -19,7 +19,6 @@ export default async function ProfilePage({
 }) {
   const { key } = await params;
   let user: null | PermishoutUser = null;
-
   try {
     const res = await api.get(`/users?userKey=${key}`);
     user = res.data as PermishoutUser;
@@ -49,12 +48,7 @@ export default async function ProfilePage({
           />
         </div>
 
-        <div className="flex items-center p-4">
-          <div className="flex items-center gap-2 ">
-            <div className="font-bold">Following</div> <div>30</div>
-          </div>
-          <Button className="rounded-full ml-auto">Follow</Button>
-        </div>
+        <FollowSection userKey={key} />
       </div>
       <div className="flex flex-col gap-4">
         {shouts.map((shout) => (

@@ -7,38 +7,38 @@ const POST = async (request: NextRequest) => {
   const { userId } = getAuth(request) || "";
 
   if (!userId) return NextResponse.json({ success: false }, { status: 403 });
-  const { userToFollowKey } = await request.json();
+  const { userToUnfollowKey } = await request.json();
 
   const currentUser = await permit.api.getUser(userId);
 
   try {
-    const userToFollow = await permit.api.getUser(userToFollowKey);
+    const userToUnfollow = await permit.api.getUser(userToUnfollowKey);
 
-    if (userToFollow.key === currentUser.key)
+    if (userToUnfollow.key === currentUser.key)
       return NextResponse.json({
         success: false,
-        message: "You cannot follow yourself",
+        message: "You cannot unfollow yourself",
       });
 
-    await permit.api.roleAssignments.assign({
+    await permit.api.roleAssignments.unassign({
       user: currentUser.key,
       role: "follower",
-      resource_instance: `profile:profile_${userToFollow.key}`,
+      resource_instance: `profile:profile_${userToUnfollow.key}`,
       tenant: "default",
     });
 
-    await permit.api.roleAssignments.assign({
-      user: userToFollow.key,
+    await permit.api.roleAssignments.unassign({
+      user: userToUnfollow.key,
       role: "followee",
       resource_instance: `profile:profile_${currentUser.key}`,
       tenant: "default",
     });
 
-    const userToFollowAttrs =
-      userToFollow.attributes as PermishoutUserAttributes;
+    const userToUnfollowAttrs =
+      userToUnfollow.attributes as PermishoutUserAttributes;
     return NextResponse.json({
       success: true,
-      message: `Followed user @${userToFollowAttrs.username}`,
+      message: `Unfollowed user @${userToUnfollowAttrs.username}`,
     });
   } catch (e) {
     return NextResponse.json(

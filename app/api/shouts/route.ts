@@ -14,9 +14,6 @@ const GET = async (request: NextRequest) => {
     const shouts = await permit.api.resourceInstances.list({
       resource: "shout",
       tenant: "default",
-      // filter: {
-      //   subject: `profile:profile_${userId}`,
-      // },
     });
     const shoutList: Shout[] = shouts.map((shout) => {
       const shoutAttrs = shout.attributes as ShoutAttributes;
