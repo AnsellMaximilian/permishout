@@ -30,9 +30,9 @@ export default async function ProfilePage({
   const shouts: Shout[] = (await api.get(`/shouts?shouterKey=${key}`)).data;
 
   return (
-    <div className="mx-auto max-w-2xl bg-white mt-4 rounded-md">
+    <div className="bg-white rounded-md">
       <div className="border-border border-b">
-        <div className="flex items-center flex-col gap-1 bg-amber-100 p-4 ">
+        <div className="flex items-center flex-col gap-1 bg-amber-100 p-4 rounded-t-md">
           <Image src={icon} width={100} height={100} alt="Icon" />
           <h1 className="text-2xl font-bold">{user.name}</h1>
           <p className="text-muted-foreground">@{user.username}</p>

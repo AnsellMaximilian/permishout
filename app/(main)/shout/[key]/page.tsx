@@ -33,7 +33,7 @@ export default async function ShoutPage({
   });
 
   return (
-    <div className="mx-auto max-w-2xl mt-6 bg-white shadow-md rounded-md">
+    <div className="bg-white shadow-md rounded-md">
       <div className="p-4 rounded-lg space-y-4">
         <div className="">
           <Link

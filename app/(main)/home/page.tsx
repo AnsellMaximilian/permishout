@@ -25,7 +25,7 @@ export default function HomePage() {
     })();
   }, []);
   return (
-    <div className="mx-auto max-w-2xl bg-white mt-4 rounded-md">
+    <div className="bg-white rounded-md">
       <div className="border-b border-border pb-4">
         <ShoutComposer setShouts={setShouts} />
       </div>
