@@ -86,6 +86,16 @@ const POST = async (request: NextRequest) => {
       username: userAttrs?.username || "",
       replyTo: replyTo || undefined,
     };
+
+    if (replyTo && replyMode !== ShoutReplyType.EVERYONE && !permit.check) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "You are not allowed to reply to his message",
+        },
+        { status: 403 }
+      );
+    }
     const shout = await permit.api.resourceInstances.create({
       resource: "shout",
       key: shoutKey,

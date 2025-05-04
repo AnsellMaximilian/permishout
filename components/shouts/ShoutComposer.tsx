@@ -28,6 +28,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { PermishoutUser } from "@/types/user";
+import { isAxiosError } from "axios";
 export default function ShoutComposer({
   replyingTo,
   setShouts,
@@ -74,8 +75,12 @@ export default function ShoutComposer({
       toast("You just shouted!");
       if (onPosted) onPosted();
     } catch (error) {
-      console.error(error);
-      toastError("Something went wrong.");
+      if (isAxiosError(error)) {
+        const message = error.response?.data?.message || "Unknown error.";
+        toastError(message);
+      } else {
+        toastError("Unexpected error occurred.");
+      }
     } finally {
       setLoading(false);
       setContent("");
