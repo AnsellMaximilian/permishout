@@ -124,6 +124,19 @@ const POST = async (request: NextRequest) => {
           tenant: "default",
         });
       }
+    } else if (replyMode === ShoutReplyType.ADMIN) {
+      const users = await permit.api.users.list({ perPage: 100 });
+      const admins = users.data.filter((user) =>
+        user.roles?.some((r) => r.role === "admin")
+      );
+      for (const user of admins) {
+        await permit.api.roleAssignments.assign({
+          user: user.key,
+          role: "mentioned",
+          resource_instance: `shout:${shoutKey}`,
+          tenant: "default",
+        });
+      }
     }
 
     await permit.api.roleAssignments.assign({
