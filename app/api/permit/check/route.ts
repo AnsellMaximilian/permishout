@@ -2,10 +2,14 @@ import permit from "@/lib/permit";
 import { PermishoutUserAttributes } from "@/types/user";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
     const { searchParams } = req.nextUrl;
     const userId = searchParams.get("user");
+
+    const { resourcesAndActions } = await req.json();
+
+    console.log({ resourcesAndActions });
 
     if (!userId) {
       return NextResponse.json(
@@ -13,10 +17,6 @@ export async function GET(req: NextRequest) {
         { status: 400 }
       );
     }
-
-    const resourcesAndActions = JSON.parse(
-      searchParams.get("resourcesAndActions") || "[]"
-    );
 
     const checkPermissions = async (resourceAndAction: {
       resource: string;
@@ -28,6 +28,12 @@ export async function GET(req: NextRequest) {
       const { resource, action, userAttributes, resourceAttributes } =
         resourceAndAction;
 
+      const [resourceType, resourceKey] = resource.split(":");
+
+      console.log(
+        `Checking permission for ${userId} on ${resourceKey} for action ${action}. Type: ${resourceType}`
+      );
+
       return permit.check(
         {
           key: userId,
@@ -35,7 +41,8 @@ export async function GET(req: NextRequest) {
         },
         action,
         {
-          type: resource,
+          type: resourceType,
+          key: resourceKey,
           attributes: resourceAttributes,
           tenant: "default",
         }
@@ -45,6 +52,8 @@ export async function GET(req: NextRequest) {
     const permittedList = await Promise.all(
       resourcesAndActions.map(checkPermissions)
     );
+
+    console.log("Permitted List: ", permittedList);
 
     return NextResponse.json({ permittedList }, { status: 200 });
   } catch (error) {

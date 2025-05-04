@@ -2,28 +2,40 @@
 
 import ShoutComposer from "@/components/shouts/ShoutComposer";
 import ShoutItem from "@/components/shouts/ShoutItem";
+import { useAbility } from "@/hooks/useAbility";
 import api from "@/lib/api";
 import { toastError } from "@/lib/utils";
 import { Shout } from "@/types/shout";
 import { Loader2 } from "lucide-react";
+import { ActionResourceSchema } from "permit-fe-sdk";
 import { useEffect, useState } from "react";
 
 export default function HomePage() {
   const [shouts, setShouts] = useState<Shout[]>([]);
   const [loading, setLoading] = useState(true);
+  const { setActionResources } = useAbility();
   useEffect(() => {
     (async () => {
       try {
-        const shouts = await api.get("/shouts");
+        const res = await api.get("/shouts");
 
-        setShouts(shouts.data as Shout[]);
+        const shouts: Shout[] = res.data;
+
+        setShouts(shouts);
+
+        const shoutActions: ActionResourceSchema[] = shouts.flatMap((shout) => [
+          { action: "reply", resource: `shout:${shout.key}` },
+          { action: "delete", resource: `shout:${shout.key}` },
+        ]);
+
+        setActionResources(shoutActions);
       } catch {
         toastError("Error fetching shouts.");
       } finally {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [setActionResources]);
   return (
     <div className="bg-white rounded-md">
       <div className="border-b border-border pb-4">

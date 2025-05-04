@@ -34,6 +34,7 @@ const GET = async (request: NextRequest) => {
     country: attrs?.country || "",
     username: attrs?.username || "",
     yearBorn: attrs?.yearBorn || 1990,
+    roles: user.roles?.map((r) => r.role) || [],
   };
   return NextResponse.json(permishoutUser);
 };

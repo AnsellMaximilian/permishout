@@ -4,6 +4,7 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
 import UserContextProvider from "@/context/user/UserContextProvider";
+import { AbilityLoader } from "@/context/permission/AbilityContextProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,15 +29,17 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <UserContextProvider>
-        <html lang="en" suppressHydrationWarning>
-          <body
-            suppressHydrationWarning
-            className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen flex flex-col bg-muted`}
-          >
-            {children}
-            <Toaster />
-          </body>
-        </html>
+        <AbilityLoader>
+          <html lang="en" suppressHydrationWarning>
+            <body
+              suppressHydrationWarning
+              className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen flex flex-col bg-muted`}
+            >
+              {children}
+              <Toaster />
+            </body>
+          </html>
+        </AbilityLoader>
       </UserContextProvider>
     </ClerkProvider>
   );

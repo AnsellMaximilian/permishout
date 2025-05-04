@@ -109,6 +109,19 @@ const createResources = async () => {
       },
     },
   });
+
+  await permit.api.createRole({
+    key: "admin",
+    name: "Admin",
+    permissions: [
+      "topic:view",
+      "topic:create",
+      "topic:update",
+      "topic:delete",
+      "shout:delete",
+      "shout:view",
+    ],
+  });
 };
 
 const createResourceRelations = async () => {

@@ -4,19 +4,29 @@ import { Shout, ShoutReplyLabels } from "@/types/shout";
 import React from "react";
 import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
-import { MessageCircle, Repeat, Heart } from "lucide-react"; // shadcn icons
+import { MessageCircle, Repeat, Heart, Trash } from "lucide-react"; // shadcn icons
+import { Can } from "@casl/react";
+import { useAbility } from "@/hooks/useAbility";
+import { permitState } from "permit-fe-sdk";
 
 export default function ShoutItem({ shout }: { shout: Shout }) {
   const timeAgo = formatDistanceToNow(new Date(shout.createdAt), {
     addSuffix: true,
   });
 
+  const { ability } = useAbility();
+
   const router = useRouter();
+
+  console.log(
+    `CHECKING _>>>> shout:${shout.key}`,
+    permitState?.check("reply", `shout:${shout.key}`, {}, {})
+  );
 
   return (
     <div
       className="block hover:bg-muted transition cursor-pointer"
-      onClick={(e) => {
+      onClick={async (e) => {
         e.stopPropagation();
         router.push(`/shout/${shout.key}`);
       }}
@@ -65,6 +75,13 @@ export default function ShoutItem({ shout }: { shout: Shout }) {
             <Heart size={16} />
             <span>Like</span>
           </div>
+
+          <Can I="delete" a={`shout:${shout.key}`} ability={ability}>
+            <div className="flex items-center gap-1 text-red-400 hover:text-red-500 ml-auto">
+              <Trash size={16} />
+              <span>Delete</span>
+            </div>
+          </Can>
         </div>
       </div>
     </div>

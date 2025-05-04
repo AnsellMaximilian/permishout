@@ -19,6 +19,7 @@ export default function UserContextProvider({
         setLoading(true);
         const res = await api.get("/users");
         const permishoutUser = res.data as PermishoutUser;
+
         setUser(permishoutUser);
       } catch {
         setUser(null);
