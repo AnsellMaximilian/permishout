@@ -6,7 +6,7 @@ import Image from "next/image";
 export default function Home() {
   return (
     <div className="bg-white grow">
-      <div className="mx-auto container flex flex-col justify-center items-center h-screen">
+      <div className="mx-auto container flex flex-col justify-center items-center h-screen p-4">
         <Link href="/profile/create">
           <Image src={logo} alt="PermiShout Logo" width={400} height={400} />
         </Link>
@@ -18,7 +18,7 @@ export default function Home() {
           Shout only when you’re allowed.
         </p>
         <Link href="/profile/create" className={buttonVariants({ size: "lg" })}>
-          Create Profile
+          Get Started
         </Link>
       </div>
     </div>
