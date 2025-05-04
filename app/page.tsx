@@ -3,6 +3,8 @@ import Link from "next/link";
 import logo from "@/assets/images/permishout-logo-full-vertical.svg";
 import Image from "next/image";
 
+import permitiologo from "@/assets/images/permitio.svg";
+
 export default function Home() {
   return (
     <div className="bg-white grow">
@@ -20,6 +22,18 @@ export default function Home() {
         <Link href="/profile/create" className={buttonVariants({ size: "lg" })}>
           Get Started
         </Link>
+
+        <div className="flex items-center justify-center gap-2 mt-2">
+          <div>Powered by</div>
+          <a href="https://www.permit.io/" target="_blank">
+            <Image
+              src={permitiologo}
+              alt="Permit.io Logo"
+              width={75}
+              height={75}
+            />
+          </a>
+        </div>
       </div>
     </div>
   );
