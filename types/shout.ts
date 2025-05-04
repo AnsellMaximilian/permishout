@@ -3,7 +3,7 @@ import {
   Earth,
   LucideProps,
   ShieldCheck,
-  UserCheck,
+  // UserCheck,
 } from "lucide-react";
 
 export interface Shout extends ShoutAttributes {
@@ -23,14 +23,14 @@ export interface ShoutAttributes {
 
 export enum ShoutReplyType {
   EVERYONE = "EVERYONE",
-  PEOPLE_FOLLOWED = "PEOPLE_FOLLOWED",
+  // PEOPLE_FOLLOWED = "PEOPLE_FOLLOWED",
   MENTIONED = "MENTIONED",
   ADMIN = "ADMIN",
 }
 
 export const ShoutReplyLabels: Record<ShoutReplyType, string> = {
   [ShoutReplyType.EVERYONE]: "Everyone",
-  [ShoutReplyType.PEOPLE_FOLLOWED]: "People you follow",
+  // [ShoutReplyType.PEOPLE_FOLLOWED]: "People you follow",
   [ShoutReplyType.MENTIONED]: "Only people you mention",
   [ShoutReplyType.ADMIN]: "Verified accunts (admins).",
 };
@@ -46,7 +46,7 @@ export const ShoutReplyIcons: Record<
   >
 > = {
   [ShoutReplyType.EVERYONE]: Earth,
-  [ShoutReplyType.PEOPLE_FOLLOWED]: UserCheck,
+  // [ShoutReplyType.PEOPLE_FOLLOWED]: UserCheck,
   [ShoutReplyType.MENTIONED]: AtSign,
   [ShoutReplyType.ADMIN]: ShieldCheck,
 };
