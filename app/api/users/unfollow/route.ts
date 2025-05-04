@@ -21,15 +21,8 @@ const POST = async (request: NextRequest) => {
       });
 
     await permit.api.roleAssignments.unassign({
-      user: currentUser.key,
-      role: "follower",
-      resource_instance: `profile:profile_${userToUnfollow.key}`,
-      tenant: "default",
-    });
-
-    await permit.api.roleAssignments.unassign({
       user: userToUnfollow.key,
-      role: "followee",
+      role: "followed",
       resource_instance: `profile:profile_${currentUser.key}`,
       tenant: "default",
     });

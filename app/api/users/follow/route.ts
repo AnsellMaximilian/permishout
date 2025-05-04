@@ -21,15 +21,8 @@ const POST = async (request: NextRequest) => {
       });
 
     await permit.api.roleAssignments.assign({
-      user: currentUser.key,
-      role: "follower",
-      resource_instance: `profile:profile_${userToFollow.key}`,
-      tenant: "default",
-    });
-
-    await permit.api.roleAssignments.assign({
       user: userToFollow.key,
-      role: "followee",
+      role: "followed",
       resource_instance: `profile:profile_${currentUser.key}`,
       tenant: "default",
     });

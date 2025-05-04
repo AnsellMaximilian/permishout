@@ -1,14 +1,11 @@
 "use client";
 
-import ShoutComposer from "@/components/shouts/ShoutComposer";
 import ShoutItem from "@/components/shouts/ShoutItem";
-import { useAbility } from "@/hooks/useAbility";
 import api from "@/lib/api";
 import { toastError } from "@/lib/utils";
 import { Shout } from "@/types/shout";
 import { Loader2 } from "lucide-react";
-import { ActionResourceSchema } from "permit-fe-sdk";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -18,37 +15,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { isAxiosError } from "axios";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-
-export default function HomePage() {
-  const [shouts, setShouts] = useState<Shout[]>([]);
+import { toast } from "sonner";
+import { isAxiosError } from "axios";
+export default function ReplySection({ shoutKey }: { shoutKey: string }) {
+  const [replies, setReplies] = useState<Shout[]>([]);
   const [loading, setLoading] = useState(true);
-  const { setActionResources } = useAbility();
-
   const [shoutToDeleteKey, setShoutToDeleteKey] = useState<null | string>(null);
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await api.get("/shouts");
-
-        const shouts: Shout[] = res.data;
-
-        setShouts(shouts);
-      } catch {
-        toastError("Error fetching shouts.");
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
 
   const handleDeleteShout = async () => {
     try {
       const res = await api.delete(`/shouts/${shoutToDeleteKey}`);
       const deletedShout = res.data as Shout;
-      setShouts((prev) =>
+      setReplies((prev) =>
         prev.filter((shout) => shout.key !== deletedShout.key)
       );
       toast("Deleted successfully");
@@ -66,34 +45,42 @@ export default function HomePage() {
   };
 
   useEffect(() => {
-    const shoutActions: ActionResourceSchema[] = shouts.flatMap((shout) => [
-      { action: "reply", resource: `shout:${shout.key}` },
-      { action: "delete", resource: `shout:${shout.key}` },
-    ]);
-
-    setActionResources(shoutActions);
-  }, [shouts, setActionResources]);
+    (async () => {
+      setLoading(true);
+      try {
+        const res = await api.get(`/shouts?replyTo=${shoutKey}`);
+        const data = (await res.data) as Shout[];
+        setReplies(data);
+      } catch (error) {
+        toastError(
+          error instanceof Error ? error.message : "Failed to load replies"
+        );
+        setReplies([]);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [shoutKey]);
   return (
-    <div className="bg-white rounded-md">
-      <div className="border-b border-border pb-4">
-        <ShoutComposer setShouts={setShouts} />
-      </div>
-
+    <div className="rounded-md rounded-t-none shadow-sm border-border border-t">
+      <h3 className="text-sm px-4 pt-3 pb-1 text-muted-foreground font-semibold">
+        Replies
+      </h3>
       <div className="flex flex-col gap-4">
         {loading ? (
           <div className="p-12 flex justify-center items-center">
             <Loader2 className="animate-spin" size={40} />
           </div>
-        ) : shouts.length === 0 ? (
+        ) : replies.length === 0 ? (
           <div className="p-12">
             <p className="text-center text-muted-foreground text-sm">
               No shouts yet. Be the first to shout!
             </p>
           </div>
         ) : (
-          shouts.map((shout) => (
+          replies.map((shout) => (
             <ShoutItem
-              setShouts={setShouts}
+              setShouts={setReplies}
               key={shout.key}
               shout={shout}
               setShoutToDeleteKey={setShoutToDeleteKey}
@@ -101,7 +88,6 @@ export default function HomePage() {
           ))
         )}
       </div>
-
       <AlertDialog
         open={!!shoutToDeleteKey}
         onOpenChange={(open) => {

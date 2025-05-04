@@ -1,12 +1,11 @@
-import { mockShouts } from "@/const/shout";
 import React from "react";
 import { notFound } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 import { MessageCircle, Repeat, Heart } from "lucide-react";
-import ShoutItem from "@/components/shouts/ShoutItem";
 import api from "@/lib/api";
 import { Shout } from "@/types/shout";
 import Link from "next/link";
+import ReplySection from "./ReplySection";
 
 export default async function ShoutPage({
   params,
@@ -25,8 +24,6 @@ export default async function ShoutPage({
   }
 
   if (!shout) notFound();
-
-  const replies = mockShouts.filter((s) => s.key !== key).slice(0, 4);
 
   const timeAgo = formatDistanceToNow(new Date(shout.createdAt), {
     addSuffix: true,
@@ -72,14 +69,7 @@ export default async function ShoutPage({
         </div>
       </div>
 
-      <div className="rounded-md rounded-t-none shadow-sm border-border border-t">
-        <h3 className="text-sm px-4 pt-3 pb-1 text-muted-foreground font-semibold">
-          Replies
-        </h3>
-        {replies.map((reply) => (
-          <ShoutItem key={reply.key} shout={reply} />
-        ))}
-      </div>
+      <ReplySection shoutKey={key} />
     </div>
   );
 }

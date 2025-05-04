@@ -8,22 +8,34 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
+  SelectGroup,
+  SelectLabel,
 } from "@/components/ui/select";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import {
   isValidReplyMode,
   Shout,
+  ShoutReplyIcons,
   ShoutReplyLabels,
   ShoutReplyType,
 } from "@/types/shout";
 import api from "@/lib/api";
-import { toastError } from "@/lib/utils";
+import { cn, toastError } from "@/lib/utils";
 import { toast } from "sonner";
-
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { PermishoutUser } from "@/types/user";
 export default function ShoutComposer({
+  replyingTo,
   setShouts,
+  onPosted,
 }: {
-  setShouts: Dispatch<SetStateAction<Shout[]>>;
+  setShouts?: Dispatch<SetStateAction<Shout[]>>;
+  replyingTo?: Shout;
+  onPosted?: () => void;
 }) {
   const [content, setContent] = useState("");
   const [replyMode, setReplyMode] = useState<ShoutReplyType>(
@@ -32,12 +44,35 @@ export default function ShoutComposer({
 
   const [loading, setLoading] = useState(false);
 
+  const [showMentions, setShowMentions] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const [otherUsers, setOtherUsers] = useState<PermishoutUser[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await api.get("/users/list");
+
+        setOtherUsers(res.data as PermishoutUser[]);
+      } catch {
+        setOtherUsers([]);
+      }
+    })();
+  }, []);
+
   const handlePost = async () => {
     try {
       setLoading(true);
-      const res = await api.post("/shouts", { content, replyMode });
-      setShouts((prev) => [res.data as Shout, ...prev]);
+      const res = await api.post("/shouts", {
+        content,
+        replyMode,
+        replyTo: replyingTo?.key,
+        replyToUsername: replyingTo?.username,
+      });
+      if (setShouts) setShouts((prev) => [res.data as Shout, ...prev]);
       toast("You just shouted!");
+      if (onPosted) onPosted();
     } catch (error) {
       console.error(error);
       toastError("Something went wrong.");
@@ -48,39 +83,103 @@ export default function ShoutComposer({
     }
   };
 
+  useEffect(() => {
+    const lastWord = content.split(/\s/).pop();
+    if (lastWord?.startsWith("@")) {
+      setShowMentions(true);
+    } else {
+      setShowMentions(false);
+    }
+  }, [content]);
+
+  const handleMentionClick = (username: string) => {
+    const words = content.trim().split(/\s/);
+    words.pop(); // remove last '@word'
+    words.push(`@${username}`);
+    const newContent = words.join(" ") + " ";
+    setContent(newContent);
+    setShowMentions(false);
+    textareaRef.current?.focus();
+  };
+
   return (
-    <div className="p-4 space-y-4">
+    <div className={cn("space-y-4", replyingTo ? "p-0" : "p-4")}>
       <Textarea
-        placeholder="What's happening?"
+        ref={textareaRef}
+        placeholder={replyingTo ? "Post your reply" : "What's happening?"}
         className="resize-none placeholder:text-xl cols border-none active:border-none shadow-none outline-none focus:border-none focus:outline-none focus-visible:ring-0"
         value={content}
         style={{ fontSize: 20 }}
         onChange={(e) => setContent(e.target.value)}
       />
 
-      <div className="flex justify-between items-center">
-        <Select
-          value={replyMode}
-          onValueChange={(value) => {
-            if (isValidReplyMode(value)) {
-              setReplyMode(value as ShoutReplyType);
-            } else setReplyMode(ShoutReplyType.EVERYONE);
-          }}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Who can reply" />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.values(ShoutReplyType).map((value) => (
-              <SelectItem key={value} value={value}>
-                {ShoutReplyLabels[value]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      {showMentions && (
+        <Popover open>
+          <PopoverTrigger asChild>
+            <div className="" />
+          </PopoverTrigger>
+          <PopoverContent
+            className="w-64 p-2"
+            align="start"
+            side="bottom"
+            sideOffset={4}
+          >
+            <div className="space-y-1">
+              {otherUsers.map((user) => (
+                <button
+                  key={user.key}
+                  className="w-full text-left px-2 py-1 hover:bg-orange-100 rounded"
+                  onClick={() => handleMentionClick(user.username)}
+                >
+                  @{user.username}{" "}
+                  <span className="text-sm text-gray-500">({user.name})</span>
+                </button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+      )}
 
-        <Button onClick={handlePost} disabled={!content.trim() || loading}>
-          Post
+      <div className="flex items-center">
+        {!replyingTo && (
+          <Select
+            value={replyMode}
+            onValueChange={(value) => {
+              if (isValidReplyMode(value)) {
+                setReplyMode(value as ShoutReplyType);
+              } else setReplyMode(ShoutReplyType.EVERYONE);
+            }}
+          >
+            <SelectTrigger className="w-[250px] border-none shadow-none">
+              <SelectValue placeholder="Who can reply" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Who can reply</SelectLabel>
+                {Object.values(ShoutReplyType).map((value) => {
+                  const Icon = ShoutReplyIcons[value];
+                  return (
+                    <SelectItem
+                      key={value}
+                      value={value}
+                      className="flex items-center gap-2"
+                    >
+                      <Icon className="text-orange-400" />
+                      <span>{ShoutReplyLabels[value]}</span>
+                    </SelectItem>
+                  );
+                })}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        )}
+
+        <Button
+          onClick={handlePost}
+          disabled={!content.trim() || loading}
+          className="ml-auto"
+        >
+          {replyingTo ? "Reply" : "Shout"}
         </Button>
       </div>
     </div>

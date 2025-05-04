@@ -1,14 +1,20 @@
 import { getAuth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import permit from "@/lib/permit";
-import { isValidReplyMode, Shout, ShoutAttributes } from "@/types/shout";
+import {
+  isValidReplyMode,
+  Shout,
+  ShoutAttributes,
+  ShoutReplyType,
+} from "@/types/shout";
 import { v4 as uuidv4 } from "uuid";
 import { PermishoutUserAttributes } from "@/types/user";
-import { joinName, sortByDateDesc } from "@/lib/utils";
+import { getPermishoutUsers, joinName, sortByDateDesc } from "@/lib/utils";
 
 const GET = async (request: NextRequest) => {
   const searchParams = request.nextUrl.searchParams;
   const shouterkey = searchParams.get("shouterKey");
+  const replyTo = searchParams.get("replyTo");
 
   try {
     const shouts = await permit.api.resourceInstances.list({
@@ -31,6 +37,16 @@ const GET = async (request: NextRequest) => {
       // filter by createdAt in descending order
       return NextResponse.json(sortByDateDesc(filteredShouts, "createdAt"));
     }
+
+    // if replyTo is provided, filter the shoutList
+    if (replyTo) {
+      const filteredShouts = shoutList.filter(
+        (shout) => shout.replyTo === replyTo
+      );
+      // filter by createdAt in descending order
+      return NextResponse.json(sortByDateDesc(filteredShouts, "createdAt"));
+    }
+
     // if shouterkey is not provided, return all shouts
     return NextResponse.json(sortByDateDesc(shoutList, "createdAt"));
   } catch (e) {
@@ -48,7 +64,7 @@ const POST = async (request: NextRequest) => {
   const { userId } = getAuth(request) || "";
 
   if (!userId) return NextResponse.json({ success: false }, { status: 403 });
-  const { content, replyMode } = await request.json();
+  const { content, replyMode, replyTo } = await request.json();
 
   if (!isValidReplyMode(replyMode) || !content)
     return NextResponse.json({ success: false }, { status: 400 });
@@ -63,11 +79,12 @@ const POST = async (request: NextRequest) => {
 
     const shoutAttrs: ShoutAttributes = {
       content,
-      replyMode,
+      replyMode: replyTo ? ShoutReplyType.EVERYONE : replyMode,
       name: joinName(permitUser.first_name, permitUser.last_name),
       userId,
       createdAt: new Date().toISOString(),
       username: userAttrs?.username || "",
+      replyTo: replyTo || undefined,
     };
     const shout = await permit.api.resourceInstances.create({
       resource: "shout",
@@ -76,7 +93,38 @@ const POST = async (request: NextRequest) => {
       attributes: shoutAttrs,
     });
 
-    console.log("Created shout", shout);
+    // if reply mode is for people mentioned
+    if (replyMode === ShoutReplyType.MENTIONED) {
+      const users = await permit.api.users.list({ perPage: 100 });
+
+      const permishoutUsers = getPermishoutUsers(users.data);
+
+      // Extract all @usernames from the content
+      const mentionRegex = /@(\w+)/g;
+      const matches = Array.from(
+        content.matchAll(mentionRegex)
+      ) as RegExpMatchArray[];
+
+      const mentionedUsernames = matches.map((match) => match[1]);
+
+      // Deduplicate
+      const uniqueUsernames = [...new Set(mentionedUsernames)];
+
+      // Match usernames to Permit users
+      const mentionedUsers = permishoutUsers.filter((user) =>
+        uniqueUsernames.includes(user.username)
+      );
+
+      // Assign role for each
+      for (const user of mentionedUsers) {
+        await permit.api.roleAssignments.assign({
+          user: user.key,
+          role: "mentioned",
+          resource_instance: `shout:${shoutKey}`,
+          tenant: "default",
+        });
+      }
+    }
 
     await permit.api.roleAssignments.assign({
       user: permitUser.key,

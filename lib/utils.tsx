@@ -2,6 +2,8 @@ import { clsx, type ClassValue } from "clsx";
 import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
 import { X } from "lucide-react";
+import { UserRead } from "permitio";
+import { PermishoutUser, PermishoutUserAttributes } from "@/types/user";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -49,4 +51,24 @@ export function sortByDateDesc<
 
 export function getCountryFromKey(key: string) {
   return key.split("-")[1] || "Not specified";
+}
+
+export function getPermishoutUsers(users: UserRead[]) {
+  const permiShoutUsers = users.map((user) => {
+    const attrs = user.attributes as PermishoutUserAttributes | undefined;
+
+    const permishoutUser: PermishoutUser = {
+      key: user.key,
+      createdAt: user.created_at,
+      email: user.email || "",
+      name: joinName(user.first_name, user.last_name),
+      country: attrs?.country || "",
+      username: attrs?.username || "",
+      yearBorn: attrs?.yearBorn || 1990,
+      roles: user.roles?.map((r) => r.role) || [],
+    };
+    return permishoutUser;
+  });
+
+  return permiShoutUsers;
 }

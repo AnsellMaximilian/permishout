@@ -68,6 +68,10 @@ const createResources = async () => {
         name: "Replier",
         permissions: ["read", "reply"],
       },
+      mentioned: {
+        name: "Mentioned",
+        permissions: ["read", "reply"],
+      },
     },
   });
 
@@ -76,7 +80,6 @@ const createResources = async () => {
     key: "topic",
     name: "Topic",
     actions: {
-      // view, delete, create, update
       view: {},
       delete: {},
       create: {},
@@ -99,12 +102,8 @@ const createResources = async () => {
         name: "Owner",
         permissions: ["view", "create", "update"],
       },
-      follower: {
-        name: "Follower",
-        permissions: ["view"],
-      },
-      followee: {
-        name: "Followee",
+      followed: {
+        name: "Followed",
         permissions: ["view"],
       },
     },
@@ -119,7 +118,7 @@ const createResources = async () => {
       "topic:update",
       "topic:delete",
       "shout:delete",
-      "shout:view",
+      "shout:read",
     ],
   });
 };
@@ -137,7 +136,7 @@ const createResourceRelations = async () => {
 
 const createRoleDerivations = async () => {
   console.log(
-    "Granting shout:replier from profile:follower if profile is parent of shout"
+    "Granting shout:replier from profile:followed if profile is parent of shout"
   );
   await permit.api.resourceRoles.update("shout", "replier", {
     granted_to: {
@@ -145,12 +144,7 @@ const createRoleDerivations = async () => {
         {
           linked_by_relation: "parent",
           on_resource: "profile",
-          role: "follower",
-        },
-        {
-          linked_by_relation: "parent",
-          on_resource: "profile",
-          role: "followee",
+          role: "followed",
         },
       ],
     },

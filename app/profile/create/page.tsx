@@ -55,21 +55,19 @@ export default function ProfileCreationPage() {
   const handleSubmit = async () => {
     setIsLoading(true);
     if (!username || !name || !country || !yearBorn) {
-      toastError("Please fill in all fields.");
-      return;
+      throw new Error("Please fill in all fields.");
     }
 
     if (!validateUsername(username)) {
-      toastError(
+      throw new Error(
         "Username must be 4-15 characters long and can only contain letters, numbers, and underscores."
       );
-      return;
     }
 
     try {
       await api.post("/users", { username, name, yearBorn, country });
     } catch (error) {
-      console.log(error);
+      toastError(error instanceof Error ? error.message : "Unknown error");
     } finally {
       setIsLoading(false);
       router.refresh();
