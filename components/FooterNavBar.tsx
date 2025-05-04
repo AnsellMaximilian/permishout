@@ -2,7 +2,7 @@
 
 import { useUser } from "@/hooks/user";
 import { cn } from "@/lib/utils";
-import { HomeIcon, Tag, User } from "lucide-react";
+import { HomeIcon, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -14,7 +14,6 @@ export default function FooterNavBar() {
 
   const isHome = pathname === "/home";
   const isProfile = currentUser && pathname === `/profile/${currentUser?.key}`;
-  const isTopic = currentUser && pathname.startsWith("/topic");
 
   return (
     <footer className="p-4 bg-white container mx-auto max-w-2xl mt-4 rounded-md">
@@ -36,15 +35,6 @@ export default function FooterNavBar() {
             >
               <User strokeWidth={isProfile ? 2 : 1} />
               <span className={cn(isProfile ? "font-bold" : "")}>Profile</span>
-            </Link>
-          </li>
-          <li>
-            <Link
-              href={`/topic`}
-              className="flex items-center gap-2 hover:underline"
-            >
-              <Tag strokeWidth={isTopic ? 2 : 1} />
-              <span className={cn(isTopic ? "font-bold" : "")}>Topics</span>
             </Link>
           </li>
         </ul>
