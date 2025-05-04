@@ -23,5 +23,11 @@ export const GET = async () => {
         type: "shout:shout_979723d8-8e78-4066-996c-fee2c4da7f04",
       }
     ),
+    followed: await permit.api.getAssignedRoles(
+      "user_2wTvO4ZXJulS1YoK2SIjRoogEGP"
+    ),
+    follower: await permit.api.getAssignedRoles(
+      "user_2wXYc2FqUp04xGvq7c1r52ALcdR"
+    ),
   });
 };

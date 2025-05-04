@@ -27,6 +27,13 @@ const POST = async (request: NextRequest) => {
       tenant: "default",
     });
 
+    await permit.api.roleAssignments.unassign({
+      user: currentUser.key,
+      role: "follower",
+      resource_instance: `profile:profile_${userToUnfollow.key}`,
+      tenant: "default",
+    });
+
     const userToUnfollowAttrs =
       userToUnfollow.attributes as PermishoutUserAttributes;
     return NextResponse.json({

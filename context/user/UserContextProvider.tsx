@@ -20,6 +20,8 @@ export default function UserContextProvider({
         const res = await api.get("/users");
         const permishoutUser = res.data as PermishoutUser;
 
+        console.log("Swagger", permishoutUser);
+
         setUser(permishoutUser);
       } catch {
         setUser(null);

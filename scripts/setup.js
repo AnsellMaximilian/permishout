@@ -106,6 +106,10 @@ const createResources = async () => {
         name: "Followed",
         permissions: ["view"],
       },
+      follower: {
+        name: "Follower",
+        permissions: ["view"],
+      },
     },
   });
 
