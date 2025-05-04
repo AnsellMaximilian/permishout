@@ -75,18 +75,6 @@ const createResources = async () => {
     },
   });
 
-  console.log("Creating Resource: topic");
-  await permit.api.createResource({
-    key: "topic",
-    name: "Topic",
-    actions: {
-      view: {},
-      delete: {},
-      create: {},
-      update: {},
-    },
-  });
-
   // profile resource
   console.log("Creating Resource: profile");
   await permit.api.createResource({
@@ -116,14 +104,7 @@ const createResources = async () => {
   await permit.api.createRole({
     key: "admin",
     name: "Admin",
-    permissions: [
-      "topic:view",
-      "topic:create",
-      "topic:update",
-      "topic:delete",
-      "shout:delete",
-      "shout:read",
-    ],
+    permissions: ["shout:delete", "shout:read"],
   });
 };
 

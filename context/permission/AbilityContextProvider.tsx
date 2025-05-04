@@ -7,12 +7,8 @@ import { ActionResourceSchema, Permit, permitState } from "permit-fe-sdk";
 
 const defaultActionResources: ActionResourceSchema[] = [
   {
-    action: "create",
-    resource: "topic",
-  },
-  {
     action: "delete",
-    resource: "topic",
+    resource: "shout",
   },
 ];
 

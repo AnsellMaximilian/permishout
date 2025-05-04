@@ -2,15 +2,14 @@ import { PermishoutUser } from "@/types/user";
 import React from "react";
 import icon from "@/assets/images/permishout-icon.svg";
 import Image from "next/image";
-import ShoutItem from "@/components/shouts/ShoutItem";
 import { Cake, Calendar, MapPin } from "lucide-react";
 import IconText from "@/components/IconText";
 import { format } from "date-fns";
 import api from "@/lib/api";
 import { notFound } from "next/navigation";
-import { Shout } from "@/types/shout";
 import { getCountryFromKey } from "@/lib/utils";
 import FollowSection from "@/components/profile/FollowSection";
+import ProfileShouts from "../ProfileShouts";
 
 export default async function ProfilePage({
   params,
@@ -27,8 +26,6 @@ export default async function ProfilePage({
   }
 
   if (!user) notFound();
-
-  const shouts: Shout[] = (await api.get(`/shouts?shouterKey=${key}`)).data;
 
   return (
     <div className="bg-white rounded-md">
@@ -50,11 +47,7 @@ export default async function ProfilePage({
 
         <FollowSection userKey={key} />
       </div>
-      <div className="flex flex-col gap-4">
-        {shouts.map((shout) => (
-          <ShoutItem key={shout.key} shout={shout} />
-        ))}
-      </div>
+      <ProfileShouts profileKey={key} />
     </div>
   );
 }

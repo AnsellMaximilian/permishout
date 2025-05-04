@@ -32,7 +32,7 @@ export const ShoutReplyLabels: Record<ShoutReplyType, string> = {
   [ShoutReplyType.EVERYONE]: "Everyone",
   // [ShoutReplyType.PEOPLE_FOLLOWED]: "People you follow",
   [ShoutReplyType.MENTIONED]: "Only people you mention",
-  [ShoutReplyType.ADMIN]: "Verified accunts (admins).",
+  [ShoutReplyType.ADMIN]: "Verified accounts (admins).",
 };
 
 export function isValidReplyMode(value: unknown): value is ShoutReplyType {

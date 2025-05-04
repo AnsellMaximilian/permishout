@@ -18,10 +18,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { isAxiosError } from "axios";
+import { useAbility } from "@/hooks/useAbility";
+import { ActionResourceSchema } from "permit-fe-sdk";
 export default function ReplySection({ shoutKey }: { shoutKey: string }) {
   const [replies, setReplies] = useState<Shout[]>([]);
   const [loading, setLoading] = useState(true);
   const [shoutToDeleteKey, setShoutToDeleteKey] = useState<null | string>(null);
+
+  const { setActionResources } = useAbility();
 
   const handleDeleteShout = async () => {
     try {
@@ -61,6 +65,15 @@ export default function ReplySection({ shoutKey }: { shoutKey: string }) {
       }
     })();
   }, [shoutKey]);
+
+  useEffect(() => {
+    const shoutActions: ActionResourceSchema[] = replies.flatMap((shout) => [
+      { action: "reply", resource: `shout:${shout.key}` },
+      { action: "delete", resource: `shout:${shout.key}` },
+    ]);
+
+    setActionResources(shoutActions);
+  }, [replies, setActionResources]);
   return (
     <div className="rounded-md rounded-t-none shadow-sm border-border border-t">
       <h3 className="text-sm px-4 pt-3 pb-1 text-muted-foreground font-semibold">

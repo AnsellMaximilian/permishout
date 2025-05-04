@@ -76,26 +76,26 @@ export default function FollowSection({ userKey }: { userKey: string }) {
       <div className="flex items-center gap-2 ">
         <div className="font-bold">Following</div> <div>{following.length}</div>
       </div>
-      {currentUser &&
-      currentUser.id !== userKey &&
-      !followers.includes(currentUser.id) ? (
-        <Button
-          className="rounded-full ml-auto"
-          onClick={handleFollow}
-          disabled={loading}
-        >
-          Follow
-        </Button>
-      ) : (
-        <Button
-          className="rounded-full ml-auto"
-          onClick={handleUnfollow}
-          disabled={loading}
-          variant="outline"
-        >
-          Unfollow
-        </Button>
-      )}
+      {currentUser && currentUser.id !== userKey ? (
+        !followers.includes(currentUser.id) ? (
+          <Button
+            className="rounded-full ml-auto"
+            onClick={handleFollow}
+            disabled={loading}
+          >
+            Follow
+          </Button>
+        ) : (
+          <Button
+            className="rounded-full ml-auto"
+            onClick={handleUnfollow}
+            disabled={loading}
+            variant="outline"
+          >
+            Unfollow
+          </Button>
+        )
+      ) : null}
     </div>
   );
 }

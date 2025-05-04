@@ -6,7 +6,7 @@ export const GET = async () => {
     checkShout: await permit.check(
       "user_2wXYc2FqUp04xGvq7c1r52ALcdR",
       "reply",
-      "shout:shout_979723d8-8e78-4066-996c-fee2c4da7f04"
+      "shout:shout_008f7ff3-6e0c-402d-ace4-cdefbea8a0c4"
     ),
     checkAdmin: await permit.check(
       "user_2wXYc2FqUp04xGvq7c1r52ALcdR",
