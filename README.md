@@ -15,9 +15,13 @@ PermiShout uses [Permit.io](https://www.permit.io/) to manage fine-grained acces
 Clone the project into the desired folder
 ```bash
 git clone https://github.com/AnsellMaximilian/permishout.git
+```
 
+```bash
 cd permishout
+```
 
+```bash
 npm install
 ```
 
