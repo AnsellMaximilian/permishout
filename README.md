@@ -2,6 +2,10 @@
 
 PermiShout uses [Permit.io](https://www.permit.io/) to manage fine-grained access control to recreate some core functionalities of Twitter/X along with its authentication and authorization capabilities.
 
+![Landing](https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Fe6wbukp8x82b8ew2c889.png)
+
+![Home](https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2F9k2mpawuf91ulik5r74h.png)
+
 ## Setting Up
 
 ### Prerequisites
