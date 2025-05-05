@@ -1,6 +1,7 @@
 /* eslint-disable */
 const { Permit } = require("permitio");
 require("dotenv").config({ path: ".env.local" });
+const axios = require("axios");
 
 const permit = new Permit({
   token: process.env.PERMIT_SDK_KEY,
@@ -136,6 +137,143 @@ const createRoleDerivations = async () => {
   });
 };
 
+// CREATE USERS
+
+const usersToCreate = [
+  {
+    username: "admin",
+    email: "admin@example.com",
+    password: "2025DEVChallenge",
+    firstName: "Admin",
+    lastName: "Man",
+  },
+  {
+    username: "newuser",
+    email: "newuser@example.com",
+    password: "2025DEVChallenge",
+    firstName: "New",
+    lastName: "User",
+  },
+];
+
+const axiosInstance = axios.create({
+  baseURL: "https://api.clerk.com/v1",
+  headers: {
+    Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}`,
+    "Content-Type": "application/json",
+  },
+});
+
+const findUserByUsername = async (username) => {
+  try {
+    const { data } = await axiosInstance.get(`/users`, {
+      params: { username },
+    });
+
+    return data.length > 0 ? data[0] : null;
+  } catch (error) {
+    console.error(
+      `❌ Error checking user '${username}':`,
+      error.response?.data || error.message
+    );
+    return null;
+  }
+};
+
+const createUser = async ({
+  username,
+  email,
+  password,
+  firstName,
+  lastName,
+}) => {
+  try {
+    console.log(`Creating user: ${username}, ${email}, ${password}`);
+    const { data } = await axiosInstance.post("/users", {
+      username,
+      email_address: [email],
+      password,
+      first_name: firstName,
+      last_name: lastName,
+    });
+
+    console.log(`✅ Created user '${username}' with ID: ${data.id}`);
+    return data;
+  } catch (error) {
+    console.error(
+      `❌ Failed to create user '${username}':`,
+      error.response?.data || error.message
+    );
+    return null;
+  }
+};
+
+const createUsers = async () => {
+  const createdUsers = {};
+
+  for (const user of usersToCreate) {
+    console.log(`\n🔍 Checking user: ${user.username}`);
+    const existing = await findUserByUsername(user.username);
+
+    if (existing) {
+      console.log(
+        `⚠️ User '${user.username}' already exists. ID: ${existing.id}`
+      );
+      createdUsers[user.username] = existing;
+    } else {
+      const newUser = await createUser(user);
+      if (newUser) {
+        createdUsers[user.username] = newUser;
+      }
+    }
+  }
+
+  console.log("\n🎉 Final user summary:");
+  for (const [username, user] of Object.entries(createdUsers)) {
+    console.log(
+      `- ${username}: ID=${user.id}, Email=${user.email_addresses?.[0]?.email_address}`
+    );
+  }
+
+  for (const createdUserKey in createdUsers) {
+    const createdUser = createdUsers[createdUserKey];
+    console.log(
+      `Syncing user ${createdUser.username} with id ${createdUser.id} and email ${createdUser.email_addresses[0].email_address}`
+    );
+    const { attributes } = await permit.api.syncUser({
+      key: createdUser.id,
+      first_name: createdUser.first_name,
+      last_name: createdUser.last_name,
+      email: createdUser.email_addresses[0].email_address,
+      attributes: {
+        username: createdUser.username,
+        yearBorn: 1990,
+        country: "United States-US",
+      },
+    });
+    console.log(`Synced user ${attributes?.username}. Now creating profile`);
+
+    await permit.api.roleAssignments.assign({
+      user: createdUser.id,
+      role: "owner",
+      resource_instance: `profile:profile_${createdUser.id}`,
+      tenant: "default",
+    });
+
+    console.log(`Created profile for use ${createdUser.username}`);
+
+    if (createdUser.username === "admin") {
+      await permit.api.roleAssignments.assign({
+        user: createdUser.id,
+        role: "admin",
+        tenant: "default",
+      });
+
+      console.log(`Made user ${createdUser.username} an admin`);
+    }
+  }
+};
+
 (async () => {
   try {
     await cleanEnv();
@@ -163,6 +301,13 @@ const createRoleDerivations = async () => {
     console.log("✅ createRoleDerivations completed");
   } catch (err) {
     console.error("❌ Error in createRoleDerivations:", err);
+  }
+
+  try {
+    await createUsers();
+    console.log("✅ Creating users completed");
+  } catch (error) {
+    console.error("❌ Error in creaing users:", error);
   }
 
   console.log("🎉 PermiShout setup complete");
